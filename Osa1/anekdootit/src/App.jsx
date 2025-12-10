@@ -3,7 +3,8 @@ import { useState } from 'react'
 const AnecdoteOfTheDay = (props) => {
     return ( 
         <>
-        {props.anecdotes[props.selected]}
+        <p>{props.anecdotes[props.selected]}</p>
+        <p>Has {props.votes[props.selected]} votes</p>
         </>
     )
 }
@@ -23,8 +24,9 @@ const MostVotes =(aanet, anecdotes) => {
   
   let i=aanet.indexOf(suurin)
   return (
-    <>Most votes: {anecdotes[i]}
-    Äänet: {suurin}
+    <>
+    <p>{anecdotes[i]}</p>
+    <p>Has {suurin} votes</p>
     </>
   )}
 }
@@ -43,10 +45,17 @@ const App = () => {
 
   const listLength = anecdotes.length
   const [selected, setSelected] = useState(0)
-  let random=(Math.round(5 * Math.random()))
+  const rand = (() => {
+    let r;
+    do {
+      r = Math.floor(Math.random() * anecdotes.length);
+      } 
+    while (r === selected);
+    return r;
+    })();
   const [votes, vote] = useState(Array(listLength).fill(0))
-  const copy=[...votes]
   const voting =(selected)=> {
+    const copy = [...votes]
       copy[selected]+=1
       vote(copy)
   }
@@ -54,14 +63,13 @@ const App = () => {
   return (
       <div>
         <h1>Anecdote of the day </h1>
-        <AnecdoteOfTheDay anecdotes={anecdotes} selected={selected}/>
+        <AnecdoteOfTheDay anecdotes={anecdotes} selected={selected} votes = {votes}/>
         <div>
-          <button onClick={() => setSelected(random)}>Next anecdote</button>
+          <button onClick={() => setSelected(rand)}>Next anecdote</button>
           <button onClick={()=> voting(selected) }>Vote</button>
         </div>
         
         <h1>Anecdotes with most votes </h1>
-        Votes:{votes[selected]}<br/>
         <div>{MostVotes (votes, anecdotes) }</div>
       </div>
   )
