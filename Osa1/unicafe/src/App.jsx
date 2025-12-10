@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 const Header =()=> {
@@ -12,16 +10,33 @@ const Header =()=> {
 }
 
 const StatisticLine  =(props)=> {
-    if (props.onko > 0 ){
     return(
-        <> 
-        <tr>
-           <td>{props.text}</td><td>{props.value}</td>
-        </tr>
-        </>
+    <>
+    <tr>
+        <td>{props.text}</td><td>{props.value}</td>
+    </tr>  
+    </>
     )
-    } else { return null}
 }
+
+const Statistics = (props) => {
+    if (props.total > 0) {
+        return(
+            <>
+                <h1>Statistics</h1>
+                <table>
+                    <StatisticLine text="good"  value ={props.good} />
+                    <StatisticLine text="neutral" value ={props.neutral} />
+                    <StatisticLine text="bad" value ={props.bad} />
+                    <StatisticLine onko={props.total} text="Bad:" value ={props.bad} />
+                    <StatisticLine onko={props.total} text="Total:" value ={props.total} />
+                    <StatisticLine onko={props.total} text="Average:" value ={((props.good*1)+(props.bad*-1))/props.total} />
+                    <StatisticLine onko={props.total} text="Positive:" value ={props.good/props.total*100} />
+                </table>
+            </>
+        )}
+}
+
 const Button =(props)=> {
     return (
         <>
@@ -29,19 +44,19 @@ const Button =(props)=> {
         </>
     )
 }
+
 const OnkoPalautteita =(props)=> {
 
         if  ( props.onko === 0) {
             return (
             <div>
                 <h1>Statistics</h1>
-                  No feedback given
+                No feedback given
              </div>
-           )} else { return <h1>Statistics</h1>}
-           
+           )}
 }
 
-const App = (props) => {
+const App = () => {
     const [good, setGood] = useState(0)
     const  [neutral, setNeutral] = useState(0)
     const [bad, setBad] = useState(0)
@@ -54,18 +69,9 @@ const App = (props) => {
         <Button handleclick={() =>setNeutral(neutral +1)} nimi="neutral"></Button>
         <Button handleclick={() =>setBad(bad +1)} nimi="bad"></Button>
         <OnkoPalautteita onko={total} />
-        <StatisticLine  onko={total} text="Good:" value ={good} />
-        <StatisticLine  onko={total} text="Neutral:" value ={neutral} />
-        <StatisticLine  onko={total} text="Bad:" value ={bad} />
-        <StatisticLine  onko={total} text="All:" value ={total} />
-        <StatisticLine  onko={total} text="Average:" value ={((good * 1)+(bad * -1))/ total } />
-        <StatisticLine  onko={total} text="Positive:" value ={good / total*100} />
-       
-    
+        <Statistics total = {total} good = {good} neutral = {neutral} bad  = {bad}/>
     </div>
         )
-
-
 }
 
 export default App
