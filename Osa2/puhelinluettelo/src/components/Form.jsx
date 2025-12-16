@@ -1,4 +1,5 @@
 import { useState } from "react"
+import personService from '../services/persons.js'
 
 const Form = ({persons, setPersons}) => {
 
@@ -6,32 +7,58 @@ const Form = ({persons, setPersons}) => {
     const [newNumber, setNewNumber] = useState('')
 
     const handleChange = (event) => {
-    console.log(event.target.value)
-    setNewName(event.target.value)
+      // Asetetaan input-kentän arvo nimeksi
+      setNewName(event.target.value)
   }
 
-  const handleNumberChange = (event) => {
-    console.log(event.target.value)
-    setNewNumber(event.target.value)
-  }
-
-   const addPerson = (event) => {
-    event.preventDefault()
-    // tarkistetaan, ettei nimeä lydy jo listasta
-    if (persons.some((p) => p.name === newName)){
-      alert(`${newName} is already added to phonebook`)
-      console.log("varattu")
-    } else {
-      const person = {
-        name: newName,
-        number: newNumber
-      }
-      setPersons(persons.concat(person))
-      // kenttien tyhjennys, kun nimi ja numero tallennettu
-      setNewName('')
-      setNewNumber('')
+    const handleNumberChange = (event) => {
+      // Asetetaan input-kentän arvo numeroksi
+      setNewNumber(event.target.value)
     }
-   }
+
+    const addPerson = (event) => {
+      event.preventDefault()
+      // Tarkastetaan löytyyk henkilö jo listalta
+      const existingPerson = persons.find(p => p.name === newName)
+
+      if (existingPerson) {
+        // Mahdollisuus päivittää numero
+        if (window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )) {
+          const updatedPerson = {
+            ...existingPerson,
+            number: newNumber
+          }
+
+          personService
+            .update(existingPerson.id, updatedPerson)
+            .then(response => {
+              setPersons(
+                persons.map(p =>
+                  p.id !== existingPerson.id ? p : response.data
+                )
+              )
+              setNewName('')
+              setNewNumber('')
+            })
+        }
+      // Jos henkilöä ei löydy, luodaan uusi
+      } else {
+        const person = {
+          name: newName,
+          number: newNumber
+        }
+
+        personService
+          .create(person)
+          .then(response => {
+            setPersons(persons.concat(response.data))
+            setNewName('')
+            setNewNumber('')
+          })
+      }
+    }
 
     return (
         <form onSubmit = {addPerson}>

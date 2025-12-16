@@ -1,13 +1,9 @@
-import nameFilter from './Filter'
 
-const Numbers = ({persons, nameFilter}) => {
+const Numbers = ({p, removePerson}) => {
 
-    const namesToShow = nameFilter == ''
-        ? persons
-        : persons.filter(p => p.name.includes(nameFilter))
 
     return (
-        <>{namesToShow.map(p => <p key={p.name}>{p.name} {p.number}</p>)}</>
+        <><p key={p.id}>{p.name} {p.number} <button onClick={removePerson}>remove</button></p> </>
     )
 } 
 
