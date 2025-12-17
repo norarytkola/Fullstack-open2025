@@ -10,8 +10,8 @@ import './index.css'
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [nameFilter, setNameFilter] = useState('')
-  const [message, setMessage] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
+  const [message, setMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
   const namesToShow = nameFilter == ''
       ? persons
       : persons.filter(p => p.name.includes(nameFilter))
@@ -42,7 +42,7 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-    console.log("meneekö tänne?")
+
     // Tarkastetaan löytyyk henkilö jo listalta
     const existingPerson = persons.find(p => p.name === newName)
 
@@ -65,9 +65,13 @@ const App = () => {
                 )
               )
               setMessage(`Person '${newName}' has been updated`)
-              setTimeout(() => {etErrorMessage(null)}, 5000)
+              setTimeout(() => {setMessage(null)}, 5000)
               setNewName('')
               setNewNumber('')
+            })
+            .catch(error => {
+              setErrorMessage(`Person '${name}' has been already been removed from the server`)
+              setTimeout(() => {etErrorMessage(null)}, 5000)
             })
         }
       // Jos henkilöä ei löydy, luodaan uusi
@@ -82,7 +86,7 @@ const App = () => {
           .then(response => {
             setPersons(persons.concat(response.data))
             setMessage(`Person '${newName}' has been added`)
-            setTimeout(() => {setErrorMessage(null)}, 5000)
+            setTimeout(() => {setMessage(null)}, 5000)
             setNewName('')
             setNewNumber('')
           })
@@ -101,7 +105,7 @@ const App = () => {
       })
       .catch(error => {
         console.error(error)
-        setErrorMessage(`Person '${name}' has been already removed from the server`)
+        setErrorMessage(`Person '${name}' has been already been removed from the server`)
         setTimeout(() => {etErrorMessage(null)}, 5000)
       })
     }

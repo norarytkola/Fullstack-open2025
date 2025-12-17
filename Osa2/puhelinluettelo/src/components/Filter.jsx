@@ -11,7 +11,8 @@ const Filter =({nameFilter, setNameFilter})=> {
 
     return(
         <div>
-        Filter shown with <input value = {nameFilter} onChange = {handleFilterChange}/></div>
+            Filter shown with <input value = {nameFilter} onChange = {handleFilterChange}/>
+        </div>
     )
 
 }

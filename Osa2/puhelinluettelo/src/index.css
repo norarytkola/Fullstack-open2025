@@ -1,11 +1,18 @@
 .error {
-    color: "red";
-    padding: "2em";
-    border-color: red;
+    color: red;
+    padding: 1em;
+    border: 2px solid red;
+    border-radius: 1em;
+    background-color: lightgray;
 }
 
 .success {
-    color: "green";
-    padding: "2em";
-    border-color: green;
+    color: green;
+    padding: 1em;
+    border: 2px solid green;
+    border-radius: 1em;
+    background-color: lightgray;
 }
+ div {
+    padding: 0.5em;
+ }
