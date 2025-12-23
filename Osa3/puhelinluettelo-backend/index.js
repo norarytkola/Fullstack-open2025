@@ -1,7 +1,9 @@
 const express = require('express')
 const app = express()
 
-const persons =[
+app.use(express.json())
+
+let persons =[
     {
         id: "1",
         name: "Arto Hellas",
@@ -30,7 +32,7 @@ app.get('/api/persons', (req, res) => {
     res.json(persons)
 })
 
-app.get('/', (req, resporesnse) => {
+app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
 
@@ -45,6 +47,40 @@ app.get('/api/persons/:id', (req, res) => {
     if (!person){
         res.send(`Couldn't find the person. Check the id and try again.`)
     }
+    res.json(person)
+})
+
+app.delete('/api/persons/:id', (req, res) => {
+  const id = req.params.id
+  const initialLength = persons.length
+  persons = persons.filter(p => p.id !== id)
+  if (persons.length === initialLength) {
+    return res.status(404).json({ error: 'Person not found' })
+  }
+
+  res.status(204).end()
+})
+
+app.post('/api/persons/', (req, res) => {
+    const {name, number} = req.body
+    if (!name || !number) {
+    return res.status(400).json({
+      error: 'name or number missing'
+    })
+  } else if (persons.map(p => p.name === name)) {
+    return res.status(400).json({
+        error: 'name is already in the Phonebook'
+    })
+  }
+    const id = persons.length > 0
+      ? Math.max(...persons.map(p => Number(p.id)))
+      : 0
+    const person = { name: name,
+            number: number,
+            id: String(id)
+    }
+  
+    persons = persons.concat(person)
     res.json(person)
 })
 
