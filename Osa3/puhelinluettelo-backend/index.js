@@ -1,8 +1,10 @@
 const express = require('express')
+const cors = require('cors')
 const app = express()
 const morgan = require('morgan')
 
 app.use(express.json())
+app.use(cors())
 morgan.token('body', (req) => {
   return req.method === 'POST' && req.url.startsWith('/api/persons')
     ? JSON.stringify(req.body)
@@ -68,7 +70,6 @@ app.delete('/api/persons/:id', (req, res) => {
   if (persons.length === initialLength) {
     return res.status(404).json({ error: 'Person not found' })
   }
-
   res.status(204).end()
 })
 
@@ -84,8 +85,8 @@ app.post('/api/persons/', (req, res) => {
     })
   }
     const id = persons.length > 0
-      ? Math.max(...persons.map(p => Number(p.id)))
-      : 0
+      ? Math.max(...persons.map(p => Number(p.id))) + 1
+      : 1
     const person = { name: name,
             number: number,
             id: String(id)
