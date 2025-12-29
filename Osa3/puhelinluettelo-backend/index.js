@@ -5,6 +5,7 @@ const morgan = require('morgan')
 
 app.use(express.json())
 app.use(cors())
+app.use(express.static('dist'))
 morgan.token('body', (req) => {
   return req.method === 'POST' && req.url.startsWith('/api/persons')
     ? JSON.stringify(req.body)
