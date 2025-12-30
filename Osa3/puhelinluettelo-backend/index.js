@@ -1,7 +1,6 @@
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
-const mongoose = require('mongoose')
 const app = express()
 const morgan = require('morgan')
 const Person = require('./models/person')
@@ -16,10 +15,9 @@ morgan.token('body', (req) => {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-    
 app.get('/api/persons', (req, res) => {
-    Person.find({}).then(p => {
-      res.json(p) })
+  Person.find({}).then(p => {
+    res.json(p) })
 })
 
 app.get('/', (req, res) => {
@@ -36,7 +34,7 @@ app.get('/info', (req, res, next) => {
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
-    Person.findById(req.params.id)
+  Person.findById(req.params.id)
     .then(p => {
       if (p) {
         res.json(p)
@@ -51,29 +49,30 @@ app.get('/api/persons/:id', (req, res, next) => {
 app.delete('/api/persons/:id', (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
     .then(result => {
+      res.json(result)
       res.status(204).end()
     })
     .catch(error => next(error))
 })
 
 app.post('/api/persons/', (req, res, next) => {
-    const {name, number} = req.body
-    if (!name || !number) {
-      return res.status(400).json({
-        error: 'name or number missing'
-      })}
-    /* MongoDB muodostaa id:n, joten jätetään tämä vaihe nyt pois
+  const { name, number } = req.body
+  if (!name || !number) {
+    return res.status(400).json({
+      error: 'name or number missing'
+    })}
+  /* MongoDB muodostaa id:n, joten jätetään tämä vaihe nyt pois
     const id = persons.length > 0
       ? Math.max(...persons.map(p => Number(p.id))) + 1
       : 1
       */
-    const person = new Person({ name: name,
-            number: number
-    })
-    person.save()
-      .then(savedP => {
-        res.json(savedP)})
-      .catch(error => next(error))
+  const person = new Person({ name: name,
+    number: number
+  })
+  person.save()
+    .then(savedP => {
+      res.json(savedP)})
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
@@ -105,15 +104,14 @@ const errorHandler = (error, req, res, next) => {
   }
 
   if (error.name === 'ValidationError') {
-  const messages = Object.values(error.errors).map(e => e.message)
-  return res.status(400).json({ error: messages.join(', ') })
+    const messages = Object.values(error.errors).map(e => e.message)
+    return res.status(400).json({ error: messages.join(', ') })
   }
 
   next(error)
 }
 
 app.use(errorHandler)
-
 
 const PORT = process.env.PORT
 app.listen(PORT)
