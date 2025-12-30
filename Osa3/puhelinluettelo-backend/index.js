@@ -14,36 +14,9 @@ morgan.token('body', (req) => {
     ? JSON.stringify(req.body)
     : ''
 })
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-app.use(
-  morgan(':method :url :status :res[content-length] - :response-time ms :body')
-)
-
-
-let persons =[
-    {
-        id: "1",
-        name: "Arto Hellas",
-        number: "050-1234785"
-      
-    },
-    {
-        id: "2",
-        name: "Ada Lovelace",
-        number: "39-44-5323523"
-      
-    },
-    {
-        id: "3",
-        name: "Dan Abramov",
-        number: "12-43-234345"
-      
-    },
-    {   id: "4",
-        name: "Mary Poppendick",
-        number : "39-23-6423122"
-    }
-  ]
+let persons = Person.find({})
     
 app.get('/api/persons', (req, res) => {
     Person.find({}).then(p => {
@@ -59,33 +32,33 @@ app.get('/info', (req, res) => {
     res.send(`<p> Phonebook has info for ${persons.length} people</p> <p> ${time}</p>`)
 })
 
-app.get('/api/persons/:id', (req, res) => {
-    Person.findById(request.params.id).then(p => {
-    response.json(p)
-  })
+app.get('/api/persons/:id', (req, res, next) => {
+    Person.findById(req.params.id)
+    .then(p => {
+      if (p) {
+        res.json(p)
+      } else {
+        res.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
-  const id = req.params.id
-  const initialLength = persons.length
-  persons = persons.filter(p => p.id !== id)
-  if (persons.length === initialLength) {
-    return res.status(404).json({ error: 'Person not found' })
-  }
-  res.status(204).end()
+
+app.delete('/api/persons/:id', (req, res, next) => {
+  Person.findByIdAndDelete(req.params.id)
+    .then(result => {
+      res.status(204).end()
+    })
+    .catch(error => next(error))
 })
 
 app.post('/api/persons/', (req, res) => {
     const {name, number} = req.body
     if (!name || !number) {
-    return res.status(400).json({
-      error: 'name or number missing'
-    })
-  } else if (persons.some(p => p.name === name)) {
-    return res.status(400).json({
-        error: 'name is already in the Phonebook'
-    })
-  }
+      return res.status(400).json({
+        error: 'name or number missing'
+      })}
     /* MongoDB muodostaa id:n, joten jätetään tämä vaihe nyt pois
     const id = persons.length > 0
       ? Math.max(...persons.map(p => Number(p.id))) + 1
@@ -95,9 +68,48 @@ app.post('/api/persons/', (req, res) => {
             number: number
     })
     person.save().then(savedP => {
-      res.json(person)
+      res.json(savedP)
     })
 })
+
+app.put('/api/persons/:id', (req, res, next) => {
+  const { number } = req.body
+
+  Person.findByIdAndUpdate(
+    req.params.id,
+    { number },
+    { new: true, runValidators: true, context: 'query' }
+  )
+    .then(updatedPerson => {
+      res.json(updatedPerson)
+    })
+    .catch(error => next(error))
+})
+
+// Virheiden käsittely:
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, req, res, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' })
+  }
+
+  if (error.name === 'ValidationError') {
+    return res.status(400).json({ error: error.message })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
+
 
 const PORT = process.env.PORT
 app.listen(PORT)
