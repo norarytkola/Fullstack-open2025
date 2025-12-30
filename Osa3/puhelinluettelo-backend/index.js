@@ -1,7 +1,10 @@
+require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
+const mongoose = require('mongoose')
 const app = express()
 const morgan = require('morgan')
+const Person = require('./models/person')
 
 app.use(express.json())
 app.use(cors())
@@ -43,7 +46,8 @@ let persons =[
   ]
     
 app.get('/api/persons', (req, res) => {
-    res.json(persons)
+    Person.find({}).then(p => {
+      res.json(p) })
 })
 
 app.get('/', (req, res) => {
@@ -56,12 +60,9 @@ app.get('/info', (req, res) => {
 })
 
 app.get('/api/persons/:id', (req, res) => {
-    const id = req.params.id
-    const person = persons.find(p => p.id === id)
-    if (!person){
-        res.send(`Couldn't find the person. Check the id and try again.`)
-    }
-    res.json(person)
+    Person.findById(request.params.id).then(p => {
+    response.json(p)
+  })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
@@ -85,18 +86,19 @@ app.post('/api/persons/', (req, res) => {
         error: 'name is already in the Phonebook'
     })
   }
+    /* MongoDB muodostaa id:n, joten jätetään tämä vaihe nyt pois
     const id = persons.length > 0
       ? Math.max(...persons.map(p => Number(p.id))) + 1
       : 1
-    const person = { name: name,
-            number: number,
-            id: String(id)
-    }
-  
-    persons = persons.concat(person)
-    res.json(person)
+      */
+    const person = new Person({ name: name,
+            number: number
+    })
+    person.save().then(savedP => {
+      res.json(person)
+    })
 })
 
-const PORT = 3001
+const PORT = process.env.PORT
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)

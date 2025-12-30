@@ -1,0 +1,7 @@
+# Kaikki node_modules-kansiot missä tahansa
+node_modules/
+
+# Kaikki .env-tiedostot 
+.env
+.env.*
+
