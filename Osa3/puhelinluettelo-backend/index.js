@@ -16,7 +16,6 @@ morgan.token('body', (req) => {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-let persons = Person.find({})
     
 app.get('/api/persons', (req, res) => {
     Person.find({}).then(p => {
@@ -27,9 +26,13 @@ app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/info', (req, res) => {
-    const time = new Date()
-    res.send(`<p> Phonebook has info for ${persons.length} people</p> <p> ${time}</p>`)
+app.get('/info', (req, res, next) => {
+  Person.countDocuments({})
+    .then(count => {
+      const time = new Date()
+      res.send(`<p>Phonebook has info for ${count} people</p><p>${time}</p>`)
+    })
+    .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
@@ -53,7 +56,7 @@ app.delete('/api/persons/:id', (req, res, next) => {
     .catch(error => next(error))
 })
 
-app.post('/api/persons/', (req, res) => {
+app.post('/api/persons/', (req, res, next) => {
     const {name, number} = req.body
     if (!name || !number) {
       return res.status(400).json({
@@ -67,14 +70,14 @@ app.post('/api/persons/', (req, res) => {
     const person = new Person({ name: name,
             number: number
     })
-    person.save().then(savedP => {
-      res.json(savedP)
-    })
+    person.save()
+      .then(savedP => {
+        res.json(savedP)})
+      .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
   const { number } = req.body
-
   Person.findByIdAndUpdate(
     req.params.id,
     { number },
@@ -102,7 +105,8 @@ const errorHandler = (error, req, res, next) => {
   }
 
   if (error.name === 'ValidationError') {
-    return res.status(400).json({ error: error.message })
+  const messages = Object.values(error.errors).map(e => e.message)
+  return res.status(400).json({ error: messages.join(', ') })
   }
 
   next(error)

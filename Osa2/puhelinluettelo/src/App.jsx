@@ -12,9 +12,9 @@ const App = () => {
   const [nameFilter, setNameFilter] = useState('')
   const [message, setMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
-  const namesToShow = nameFilter == ''
-      ? persons
-      : persons.filter(p => p.name.includes(nameFilter))
+  const namesToShow = nameFilter === ''
+    ? persons
+    : persons.filter(p => p.name.includes(nameFilter))
 
   // Datan hakeminen palvelimelta persons-listaukseen
   useEffect(() => {
@@ -70,8 +70,8 @@ const App = () => {
               setNewNumber('')
             })
             .catch(error => {
-              setErrorMessage(`Person '${name}' has been already been removed from the server`)
-              setTimeout(() => {etErrorMessage(null)}, 5000)
+              setErrorMessage(`Person '${newName}' has been already been removed from the server`)
+              setTimeout(() => {setErrorMessage(null)}, 5000)
             })
         }
       // Jos henkilöä ei löydy, luodaan uusi
@@ -90,8 +90,16 @@ const App = () => {
             setNewName('')
             setNewNumber('')
           })
-      }
-    }
+          .catch(error => {
+              console.log('error.response.data:', error.response.data)
+              let errorMsg = 'Something went wrong'
+              if (error.response && error.response.data) {
+                errorMsg = error.response.data.error || errorMsg
+              }
+              setErrorMessage(errorMsg)
+              setTimeout(() => setErrorMessage(null), 5000)
+      })
+    }}
   
   // Henkilön poistaminen nappia painamalla
   const removePerson = (id, name) => {
@@ -106,7 +114,7 @@ const App = () => {
       .catch(error => {
         console.error(error)
         setErrorMessage(`Person '${name}' has been already been removed from the server`)
-        setTimeout(() => {etErrorMessage(null)}, 5000)
+        setTimeout(() => {setMessageetErrorMessage(null)}, 5000)
       })
     }
   }
@@ -125,7 +133,7 @@ const App = () => {
           p={p}
           removePerson={() => removePerson(p.id, p.name)}
         />
-)}
+      )}
     </div>
   )
 

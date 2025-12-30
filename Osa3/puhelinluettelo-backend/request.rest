@@ -11,12 +11,12 @@
 
 // Render-appin testaus:
 
-DELETE https://puhelinluettelo-riij.onrender.com/api/persons/3 HTTP/1.1
+//DELETE https://puhelinluettelo-riij.onrender.com/api/persons/3 HTTP/1.1
 
-POST https://puhelinluettelo-riij.onrender.com/api/persons/
-Content-Type: application/json
+//POST https://puhelinluettelo-riij.onrender.com/api/persons/
+//Content-Type: application/json
 
-{
-    "name": "Anni Cee",
-    "number": "045-45547522"
-}
+//{
+//    "name": "Anni Cee",
+//    "number": "045-45547522"
+//}
