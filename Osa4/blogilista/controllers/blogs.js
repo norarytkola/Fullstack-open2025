@@ -22,14 +22,17 @@ blogsRouter.get('/:id', (request, response, next) => {
 blogsRouter.post('/', (request, response, next) => {
   const body = request.body
 
-  const Blog = new Blog({
-    content: body.content,
-    important: body.important || false,
+  const blog = new Blog({
+    title : body.title,
+    author : body.author,
+    url : body.url,
+    likes : body.likes
+
   })
 
-  Blog.save()
+  blog.save()
     .then(savedBlog => {
-      response.json(savedBlog)
+      response.status(201).json(savedBlog)
     })
     .catch(error => next(error))
 })
