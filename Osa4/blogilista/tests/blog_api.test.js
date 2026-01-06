@@ -63,7 +63,6 @@ test('adding a new blog', async () => {
     author: "Melinda Melanoma",
     url: "www.something.com",
     likes: 100,
- //   id: "123456789"
   }
   await api
     .post('/api/blogs')
@@ -74,6 +73,57 @@ test('adding a new blog', async () => {
   assert.strictEqual(
     response.body.length,
     initialBlogs.length + 1
+    )
+})
+
+// likes-kentän testaus: jos arvoa ei anneta, arvo = 0
+test('new blog without likes has 0 likes', async () => {
+  const newBlog = {
+    title: "testCase2",
+    author: "Arthur Adelmina",
+    url: "www.webpage.com",
+  }
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+ assert.strictEqual(response.body.likes, 0)
+})
+
+// testataan ettei blogin lisäämien onnistu ilman title-kenttää
+test('adding a new blog without a title fails', async () => {
+  const newBlog = {
+    author: "Cecilia Celsius",
+    url: "www.something.com",
+    likes: 100,
+  }
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+  const response = await api.get('/api/blogs')
+  assert.strictEqual(
+    response.body.length,
+    initialBlogs.length
+    )
+})
+
+// testataan ettei blogin lisäämien onnistu ilman author-kenttää
+test('adding a new blog without an author fails', async () => {
+  const newBlog = {
+    title: "BlogThatWeDontWant",
+    url: "www.something.com",
+    likes: 100,
+  }
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+  const response = await api.get('/api/blogs')
+  assert.strictEqual(
+    response.body.length,
+    initialBlogs.length
     )
 })
 

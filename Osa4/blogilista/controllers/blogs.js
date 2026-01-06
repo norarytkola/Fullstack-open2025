@@ -35,6 +35,7 @@ blogsRouter.post('/', (request, response, next) => {
       response.status(201).json(savedBlog)
     })
     .catch(error => next(error))
+    
 })
 
 blogsRouter.delete('/:id', (request, response, next) => {
