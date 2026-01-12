@@ -1,0 +1,9 @@
+// new blog
+POST http://localhost:3003/api/users/
+Content-Type: application/json
+
+{
+    "username": "testtwo2",
+    "name": "Test Two",
+    "password": "salasana4321"
+}

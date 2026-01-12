@@ -1,9 +1,14 @@
-POST http://localhost:3003/api/blogs/
-Content-Type: application/json
 
-{
-    "title": "test-blog",
+
+
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyIiwiaWQiOiI2OTY0YTA4OGUzYjgxNDQ1OWIzYWRjMjQiLCJpYXQiOjE3NjgyMzQwNzF9.AmIs6_RPzqoasaHZk1Ki5RuDUaD08p390I7sNRewEK0
+
+{   
+     "title": "test-blog",
     "author": "Some One",
     "url": "www.facebook.com",
     "likes": 100
 }
+

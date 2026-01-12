@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
@@ -30,6 +31,8 @@ beforeEach(async () => {
   blogObject = new Blog(initialBlogs[1])
   await blogObject.save()
 })
+
+// BLOGIEN TESTAAMINEN
 
 // kaikkien blogien palautus jsonina
 test.only('blogs are returned as json', async () => {
@@ -148,6 +151,25 @@ test('updating a blog', async () => {
 
   assert.strictEqual(response.body.likes, newLikes)
 })
+
+// KÄYTTÄJÄN TESTAAMINEN
+
+// käyttäjän lisäämisen testaus
+test('adding a new user', async () => {
+  const newUser = {
+    username: "testUser",
+    name: "Helmer Hitchhock",
+    password: "8charactersatleast"
+  }
+  await api
+    .post('/api/users')
+    .send(newUser)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+  const response = await api.get('/api/users')
+  assert.strictEqual(response.body.length, 1)
+})
+
 
 after(async () => {
   await mongoose.connection.close()
