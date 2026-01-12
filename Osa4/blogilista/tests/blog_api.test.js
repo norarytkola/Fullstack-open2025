@@ -103,10 +103,7 @@ test('adding a new blog without a title fails', async () => {
     .send(newBlog)
     .expect(400)
   const response = await api.get('/api/blogs')
-  assert.strictEqual(
-    response.body.length,
-    initialBlogs.length
-    )
+  assert.strictEqual(response.body.length, initialBlogs.length)
 })
 
 // testataan ettei blogin lisäämien onnistu ilman author-kenttää
@@ -121,10 +118,35 @@ test('adding a new blog without an author fails', async () => {
     .send(newBlog)
     .expect(400)
   const response = await api.get('/api/blogs')
-  assert.strictEqual(
-    response.body.length,
-    initialBlogs.length
-    )
+  assert.strictEqual(response.body.length, initialBlogs.length)
+})
+
+// testataan yksittäisen blogin poisto
+test('deleting a blog', async () => {
+  const blogsAtStart = await api.get('/api/blogs')
+  const blogToDelete = blogsAtStart.body[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAtEnd = await api.get('/api/blogs')
+  assert.strictEqual(blogsAtEnd.body.length, blogsAtStart.body.length - 1 )
+})
+
+// testataan yksittäisen blogin muokkaaminen
+test('updating a blog', async () => {
+  const blogsAtStart = await api.get('/api/blogs')
+  const blogToUpdate = blogsAtStart.body[0]
+  const newLikes = 3
+
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send({ likes: newLikes })
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  assert.strictEqual(response.body.likes, newLikes)
 })
 
 after(async () => {

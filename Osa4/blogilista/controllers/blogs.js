@@ -38,25 +38,22 @@ blogsRouter.post('/', (request, response, next) => {
     
 })
 
-blogsRouter.delete('/:id', (request, response, next) => {
-  Blog.findByIdAndDelete(request.params.id)
-    .then(() => {
-      response.status(204).end()
-    })
+blogsRouter.delete('/:id', async (request, response, next) => {
+  await Blog.findByIdAndDelete(request.params.id)
+  response.status(204).end()
+
     .catch(error => next(error))
 })
 
 blogsRouter.put('/:id', (request, response, next) => {
-  const { content, important } = request.body
+  const { likes } = request.body
 
   Blog.findById(request.params.id)
     .then(Blog => {
       if (!Blog) {
         return response.status(404).end()
       }
-
-      Blog.content = content
-      Blog.important = important
+      Blog.likes = likes
 
       return Blog.save().then((updatedBlog) => {
         response.json(updatedBlog)
